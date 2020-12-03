@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.springframework.hateoas.RepresentationModel;
@@ -13,10 +14,11 @@ public class Product extends RepresentationModel<Product> implements Serializabl
 {
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long productId;
+	
+	private long categoryId;	
 	private String name;
-	private String category;
 	private static final long serialVersionUID = 1L;
 	
 	public Product() 
@@ -44,19 +46,17 @@ public class Product extends RepresentationModel<Product> implements Serializabl
 		this.name = name;
 	}
 	
-	public String getCategory() 
-	{
-		return category;
+	public long getCategoryId() {
+		return categoryId;
 	}
-	
-	public void setCategory(String category) 
-	{
-		this.category = category;
+
+	public void setCategoryId(long categoryId) {
+		this.categoryId = categoryId;
 	}
-	
+
 	@Override
 	public String toString() 
 	{
-		return "Product [productId=" + productId + ", name=" + name + ", category=" + category + "]";
+		return "Product [productId=" + productId + ", name=" + name + ", categoryId=" + categoryId + "]";
 	}
 }
