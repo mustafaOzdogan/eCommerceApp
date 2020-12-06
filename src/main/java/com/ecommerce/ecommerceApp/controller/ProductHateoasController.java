@@ -18,7 +18,7 @@ import com.ecommerce.ecommerceApp.repository.ProductRepository;
 
 @RestController
 @RequestMapping("v2") 
-public class ProductHateoasRestController 
+public class ProductHateoasController 
 {
 	
 	@Autowired
@@ -32,12 +32,12 @@ public class ProductHateoasRestController
 		{		
 			Optional<Product> product = productRepository.findById(Long.valueOf(id));
 			
-			Link selfLink = linkTo(ProductHateoasRestController.class)
+			Link selfLink = linkTo(ProductHateoasController.class)
 							.slash(product.get().getProductId())
 							.withSelfRel();
 			
 			
-			Link deleteLink = linkTo(methodOn(ProductRestController.class)
+			Link deleteLink = linkTo(methodOn(ProductController.class)
 					  		  .deleteProduct(product.get().getProductId() + ""))
 					  		  .withRel("delete");
 			 

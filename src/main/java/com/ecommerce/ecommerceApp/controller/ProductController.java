@@ -1,7 +1,6 @@
 package com.ecommerce.ecommerceApp.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 import com.ecommerce.ecommerceApp.repository.ProductRepository;
 
 @RestController
-public class ProductRestController 
+public class ProductController 
 {
 	@Autowired
 	private ProductRepository productRepository;
@@ -34,8 +33,12 @@ public class ProductRestController
 		
 		try
 		{
-			Optional<Product> product = productRepository.findById(Long.valueOf(id));			
-			response = getSuccessfulResponse(product.get());
+			Product product = productRepository.findById(Long.valueOf(id)).orElse(null);	
+			
+			if(product == null)
+				throw new NullPointerException("Product Not Found for Id:" + id);
+			
+			response = getSuccessfulResponse(product);
 			response.setCode(HttpStatus.FOUND.value());
 		}
 		catch(Exception e)
@@ -54,12 +57,12 @@ public class ProductRestController
 		
 		try
 		{
-			Optional<Category> category = categoryRepository.findById(Long.valueOf(id)); 
+			Category category = categoryRepository.findById(Long.valueOf(id)).orElse(null); 
 			
-			if(!category.isPresent())
-				throw new Exception("Category Not Found for id:" + id);
+			if(category == null)
+				throw new NullPointerException("Category Not Found for Id:" + id);
 					
-			long categoryId = category.get().getCategoryId();
+			long categoryId = category.getCategoryId();
 			List<Product> productList = productRepository.findByCategoryId(categoryId);
 			
 			if(productList.size() == 0)
@@ -150,17 +153,6 @@ public class ProductRestController
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
 	}
 
-	private CommonResponse getSuccessfulResponse(List<Object> data)
-	{
-		CommonResponse response = new CommonResponse();
-		response.setSuccess(Boolean.TRUE);
-		response.setMessage("");
-		response.setInternalMessage("");
-		response.setData(data);
-		
-		return response;
-	}
-	
 	private CommonResponse getSuccessfulResponse(Object data)
 	{
 		CommonResponse response = new CommonResponse();

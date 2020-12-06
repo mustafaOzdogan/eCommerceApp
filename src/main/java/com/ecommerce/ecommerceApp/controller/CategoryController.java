@@ -13,7 +13,7 @@ import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 
 @RestController
-public class CategoryRestController 
+public class CategoryController 
 {
 	@Autowired
 	private CategoryRepository categoryRepository;

@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.ecommerce.ecommerceApp.EcommerceAppApplication;
 import com.ecommerce.ecommerceApp.helper.JsonUtil;
 import com.ecommerce.ecommerceApp.model.Category;
-import com.ecommerce.ecommerceApp.model.Product;
 import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 
 @RunWith(SpringRunner.class)

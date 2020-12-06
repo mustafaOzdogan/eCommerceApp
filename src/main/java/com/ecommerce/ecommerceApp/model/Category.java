@@ -10,6 +10,10 @@ import org.springframework.hateoas.RepresentationModel;
 @Entity
 public class Category extends RepresentationModel<Product> implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4465454647924670319L;
 	@Id
 	private long categoryId;	
 	private String name;
