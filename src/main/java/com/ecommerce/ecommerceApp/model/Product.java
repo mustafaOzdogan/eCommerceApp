@@ -11,17 +11,12 @@ import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 public class Product extends RepresentationModel<Product> implements Serializable
-{
-	
-	/**
-	 * 
-	 */
+{	
 	private static final long serialVersionUID = -7969283736833227768L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long productId;
-	
 	private long categoryId;	
 	private String name;
 	
