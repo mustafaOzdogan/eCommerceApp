@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.ecommerceApp.model.Category;
-import com.ecommerce.ecommerceApp.model.CommonAnswerModel;
+import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 
 @RestController
-public class CategoryController 
+public class CategoryRestController 
 {
 	@Autowired
 	private CategoryRepository categoryRepository;
 	
 	@RequestMapping(path="categories", method = RequestMethod.POST)
-	public ResponseEntity<CommonAnswerModel> addCategory(@RequestBody Category category) 
+	public ResponseEntity<CommonResponse> addCategory(@RequestBody Category category) 
 	{
-		CommonAnswerModel answer;
+		CommonResponse answer;
 		
 		try 
 		{
@@ -38,12 +38,12 @@ public class CategoryController
 			answer.setCode(HttpStatus.EXPECTATION_FAILED.value());
 		}	
 		
-		return new ResponseEntity<CommonAnswerModel>(answer, HttpStatus.OK);
+		return new ResponseEntity<CommonResponse>(answer, HttpStatus.OK);
 	}
 	
-	private CommonAnswerModel getSuccessfulAnswer(Object data)
+	private CommonResponse getSuccessfulAnswer(Object data)
 	{
-		CommonAnswerModel answer = new CommonAnswerModel();
+		CommonResponse answer = new CommonResponse();
 		answer.setSuccess(Boolean.TRUE);
 		answer.setMessage("");
 		answer.setInternalMessage("");
@@ -52,9 +52,9 @@ public class CategoryController
 		return answer;
 	}
 	
-	private CommonAnswerModel getUnsuccessfulAnswer(Exception e)
+	private CommonResponse getUnsuccessfulAnswer(Exception e)
 	{
-		CommonAnswerModel answer = new CommonAnswerModel();
+		CommonResponse answer = new CommonResponse();
 		answer.setSuccess(Boolean.FALSE);
 		answer.setMessage("Please check your information and try again.");
 		answer.setInternalMessage(e.getMessage());

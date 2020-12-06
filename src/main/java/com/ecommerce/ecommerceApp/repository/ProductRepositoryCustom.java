@@ -7,4 +7,5 @@ import com.ecommerce.ecommerceApp.model.Product;
 public interface ProductRepositoryCustom 
 {
 	List<Product> findByCategoryId(Long categoryId);
+	Product findByName(String productName);
 }

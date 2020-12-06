@@ -18,6 +18,11 @@ public class Category extends RepresentationModel<Product> implements Serializab
 	{
 		super();
 	}
+	
+	public Category(String name) 
+	{
+		this.name = name;
+	}
 
 	public long getCategoryId() 
 	{

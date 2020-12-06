@@ -1,7 +1,6 @@
 package com.ecommerce.ecommerceApp.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -33,5 +32,19 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom
 		
 		TypedQuery<Product> query = entityManager.createQuery(criteriaQuery);
 		return query.getResultList();	
+	}
+
+	@Override
+	public Product findByName(String name) 
+	{
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);
+		
+		Root<Product> product = criteriaQuery.from(Product.class);
+		Predicate productPredicate = criteriaBuilder.equal(product.get("name"), name);
+		criteriaQuery.where(productPredicate);
+		
+		TypedQuery<Product> query = entityManager.createQuery(criteriaQuery);
+		return query.getSingleResult();
 	}
 }

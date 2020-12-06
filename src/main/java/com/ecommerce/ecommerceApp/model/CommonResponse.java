@@ -1,10 +1,6 @@
 package com.ecommerce.ecommerceApp.model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class CommonAnswerModel 
+public class CommonResponse 
 {	
 	private Boolean success;
 	private int code;
@@ -12,7 +8,7 @@ public class CommonAnswerModel
 	private String internalMessage;
 	private Object data;
 	
-	public CommonAnswerModel()
+	public CommonResponse()
 	{
 	
 	}

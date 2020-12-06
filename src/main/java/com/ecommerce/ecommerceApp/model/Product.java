@@ -25,6 +25,17 @@ public class Product extends RepresentationModel<Product> implements Serializabl
 	{
 		super();
 	}
+	
+	public Product(String name) 
+	{
+		this.name = name;
+	}
+	
+	public Product(String name, long categoryId) 
+	{
+		this.name = name;
+		this.categoryId = categoryId;
+	}
 
 	public long getProductId() 
 	{
