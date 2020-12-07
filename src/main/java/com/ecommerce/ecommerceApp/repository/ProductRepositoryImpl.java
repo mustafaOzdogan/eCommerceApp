@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerceApp.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -45,6 +46,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom
 		criteriaQuery.where(productPredicate);
 		
 		TypedQuery<Product> query = entityManager.createQuery(criteriaQuery);
-		return query.getSingleResult();
+		
+		try
+		{
+			Product result = query.getSingleResult();
+			return result;
+		}
+		catch(Exception e)
+		{
+			return null;
+		}		
 	}
 }

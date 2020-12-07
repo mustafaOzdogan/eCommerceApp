@@ -2,17 +2,15 @@ package com.ecommerce.ecommerceApp.integrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +29,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.ecommerce.ecommerceApp.EcommerceAppApplication;
 import com.ecommerce.ecommerceApp.helper.JsonUtil;
+import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.Product;
+import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 import com.ecommerce.ecommerceApp.repository.ProductRepository;
 
 @RunWith(SpringRunner.class)
@@ -47,6 +47,9 @@ public class ProductRestControllerIntegrationTest
 	@Autowired
 	private ProductRepository productRepository;
 	
+	@Autowired
+	private CategoryRepository categoryRepository;
+	
 	@After
 	public void resetDb()
 	{
@@ -59,42 +62,40 @@ public class ProductRestControllerIntegrationTest
 		long categoryId = 1;
 		Product laptop = createTestProduct("laptop", categoryId);
 				
-		mvc.perform(get("products/" + Long.toString(laptop.getProductId())).contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/products/" + Long.toString(laptop.getProductId())).contentType(MediaType.APPLICATION_JSON))
 		   .andDo(print())
 		   .andExpect(status().isOk())
 		   .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-		   .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-		   .andExpect(jsonPath("$[0].name", is("laptop")))
-		   .andExpect(jsonPath("$[0].categoryId", is("categoryId")));
+		   .andExpect(jsonPath("$.data.name", is("laptop")))
+		   .andExpect(jsonPath("$.data.categoryId").value(laptop.getCategoryId()));
 	}
 	
 	@Test
 	public void givenValidCategoryId_whenGetProducts_thenStatus200() throws Exception
 	{
-		long categoryId = 1;
-		createTestProduct("laptop", categoryId);
-		createTestProduct("tv", categoryId);
+		Category electronics = createTestCategory("electronics");
+		createTestProduct("laptop", electronics.getCategoryId());
+		createTestProduct("tv", electronics.getCategoryId());
 		
-		mvc.perform(get("categories/" + categoryId + "/products").contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/categories/" + electronics.getCategoryId() + "/products").contentType(MediaType.APPLICATION_JSON))
 		 .andDo(print())
 		 .andExpect(status().isOk())
 		 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-		 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(2))))
-		 .andExpect(jsonPath("$[0].name", is("laptop")))
-		 .andExpect(jsonPath("$[0].categoryId", is("categoryId")))
-		 .andExpect(jsonPath("$[1].name", is("tv")))
-		 .andExpect(jsonPath("$[1].categoryId", is("categoryId")));
+		 .andExpect(jsonPath("$.data[0].name", is("laptop")))
+		 .andExpect(jsonPath("$.data[0].categoryId").value(electronics.getCategoryId()))
+		 .andExpect(jsonPath("$.data[1].name", is("tv")))
+		 .andExpect(jsonPath("$.data[1].categoryId").value(electronics.getCategoryId()));
 	}
 	
 	@Test 
 	public void givenValidInput_thenCreateProduct() throws IOException, Exception
 	{
 		Product laptop = new Product("laptop", 1);
-		mvc.perform(post("products").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(laptop)));
+		mvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(laptop)));
 		
 		List<Product> found = productRepository.findAll();
-		assertThat(found).extracting(Product::getProductId, Product::getName, Product::getCategoryId)
-		                 .containsOnly(tuple(laptop.getProductId(), laptop.getName(), laptop.getCategoryId()));	
+		assertThat(found).extracting(Product::getName, Product::getCategoryId)
+		                 .containsOnly(tuple(laptop.getName(), laptop.getCategoryId()));	
 	}
 	
 	@Test 
@@ -105,7 +106,7 @@ public class ProductRestControllerIntegrationTest
 		
 		laptop.setCategoryId(2);
 		
-		mvc.perform(put("products").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(laptop)));
+		mvc.perform(put("/products").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(laptop)));
 		
 		Product fromDb = productRepository.findById(laptop.getProductId()).orElse(null);
 		assertThat(fromDb.getCategoryId()).isEqualTo(laptop.getCategoryId());
@@ -117,7 +118,7 @@ public class ProductRestControllerIntegrationTest
 		long categoryId = 1;
 		Product product = createTestProduct("laptop", categoryId);
 		
-		mvc.perform(delete("products/" + Long.toString(product.getProductId())).contentType(MediaType.APPLICATION_JSON));
+		mvc.perform(delete("/products/" + Long.toString(product.getProductId())).contentType(MediaType.APPLICATION_JSON));
 		
 		Product fromDb = productRepository.findById(categoryId).orElse(null);
 		assertThat(fromDb).isNull();
@@ -128,5 +129,12 @@ public class ProductRestControllerIntegrationTest
 		Product product = new Product(name, categoryId);
 		productRepository.saveAndFlush(product);
 		return product;
+	}
+	
+	private Category createTestCategory(String name)
+	{
+		Category category = new Category(name);
+		categoryRepository.saveAndFlush(category);
+		return category;
 	}
 }

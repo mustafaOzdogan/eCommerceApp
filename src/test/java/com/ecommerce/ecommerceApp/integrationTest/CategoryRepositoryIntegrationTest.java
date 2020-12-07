@@ -25,19 +25,20 @@ public class CategoryRepositoryIntegrationTest
 	private CategoryRepository categoryRepository;
 	
 	@Test
-	public void whenFindById_thenReturnCategory(Long categoryId)
+	public void whenFindById_thenReturnCategory()
 	{
 		Category electronics = new Category("electronics");
 		entityManager.persistAndFlush(electronics);
 		
-		Category found = categoryRepository.findById(categoryId).orElse(null);
+		Category found = categoryRepository.findById(electronics.getCategoryId()).orElse(null);
 		
 		assertThat(found.getName()).isEqualTo(electronics.getName());
 	}
 	
 	@Test
-	public void whenInvalidId_thenReturnNull(Long invalidId)
+	public void whenInvalidId_thenReturnNull()
 	{
+		long invalidId = -99;
 		Category found = categoryRepository.findById(invalidId).orElse(null);
 		assertThat(found).isNull();
 	}

@@ -46,10 +46,10 @@ public class CategoryRestControllerIntegrationTest
 	public void givenValidInput_thenCreateCategory() throws IOException, Exception
 	{
 		Category electronics = new Category("electronics");
-		mvc.perform(post("categories").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(electronics)));
+		mvc.perform(post("/categories").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(electronics)));
 		
 		List<Category> found = categoryRepository.findAll();
-		assertThat(found).extracting(Category::getName, Category::getCategoryId).containsOnly(tuple("electronics", electronics.getCategoryId()));
+		assertThat(found).extracting(Category::getName).containsOnly("electronics");
 		
 	}
 }

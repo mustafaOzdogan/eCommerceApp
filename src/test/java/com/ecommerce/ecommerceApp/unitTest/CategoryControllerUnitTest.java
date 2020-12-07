@@ -1,4 +1,4 @@
-package com.ecommerce.ecommerceApp.integrationTest;
+package com.ecommerce.ecommerceApp.unitTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -23,13 +23,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.ecommerce.ecommerceApp.controller.ProductController;
+import com.ecommerce.ecommerceApp.controller.CategoryController;
 import com.ecommerce.ecommerceApp.helper.JsonUtil;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.repository.CategoryRepository;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = ProductController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(value = CategoryController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 public class CategoryControllerUnitTest 
 {
 	@Autowired
@@ -47,10 +47,10 @@ public class CategoryControllerUnitTest
 		Category electronics = new Category("electronics");
 		given(categoryRepository.save(Mockito.any())).willReturn(electronics);
 		
-		mvc.perform(post("categories").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(electronics)))
-		   .andExpect(status().isCreated())
-		   .andExpect(jsonPath("$.name", is(electronics.getName())))
-		   .andExpect(jsonPath("$.categoryId", is(electronics.getCategoryId())));
+		mvc.perform(post("/categories").contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(electronics)))
+		   .andExpect(status().isOk())
+		   .andExpect(jsonPath("$.data.name", is(electronics.getName())))
+		   .andExpect(jsonPath("$.data.categoryId").value(electronics.getCategoryId()));
 		
 	   verify(categoryRepository, VerificationModeFactory.times(1)).save(Mockito.any());
 	   reset(categoryRepository);	    

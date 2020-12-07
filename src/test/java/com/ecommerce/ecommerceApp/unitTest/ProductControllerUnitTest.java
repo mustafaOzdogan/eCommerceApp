@@ -1,4 +1,4 @@
-package com.ecommerce.ecommerceApp.integrationTest;
+package com.ecommerce.ecommerceApp.unitTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
