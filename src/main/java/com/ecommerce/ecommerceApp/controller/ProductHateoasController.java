@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.ecommerceApp.exception.ProductNotFoundException;
 import com.ecommerce.ecommerceApp.model.Product;
 import com.ecommerce.ecommerceApp.repository.ProductRepository;
 
@@ -46,7 +45,7 @@ public class ProductHateoasController
 		}
 		catch(Exception e)
 		{
-			throw new ProductNotFoundException("Product Not Found for id:" + id);
+			throw new Exception("Product Not Found for id:" + id);
 		}
 	}
 	

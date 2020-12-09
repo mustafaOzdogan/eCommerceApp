@@ -93,7 +93,6 @@ public class ProductController
 			Product createdProduct = productRepository.save(product);
 			
 			response = getSuccessfulResponse(createdProduct);
-			response.setData(createdProduct);
 			response.setCode(HttpStatus.CREATED.value());		
  		}
 		catch(Exception e)
