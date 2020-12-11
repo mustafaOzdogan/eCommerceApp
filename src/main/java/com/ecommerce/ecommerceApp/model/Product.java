@@ -15,20 +15,14 @@ public class Product extends RepresentationModel<Product> implements Serializabl
 	private static final long serialVersionUID = -7969283736833227768L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
 	private long categoryId;	
 	private String name;
 	
-	public Product() 
-	{
-		super();
-	}
+	public Product() { super(); }
 	
-	public Product(String name) 
-	{
-		this.name = name;
-	}
+	public Product(String name) { this.name = name; }
 	
 	public Product(String name, long categoryId) 
 	{
@@ -36,37 +30,20 @@ public class Product extends RepresentationModel<Product> implements Serializabl
 		this.categoryId = categoryId;
 	}
 
-	public long getProductId() 
-	{
-		return productId;
-	}
+	public long getProductId() { return productId; }
 	
-	public void setProductId(long productId)
-	{
-		this.productId = productId;
-	}
+	public void setProductId(long productId) { this.productId = productId; }
 	
-	public String getName() 
-	{
-		return name;
-	}
+	public String getName() { return name; }
 	
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+	public void setName(String name) { this.name = name; }
 	
-	public long getCategoryId() {
-		return categoryId;
-	}
+	public long getCategoryId() { return categoryId; }
 
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
-	}
+	public void setCategoryId(long categoryId) { this.categoryId = categoryId; }
 
 	@Override
-	public String toString() 
-	{
+	public String toString() {
 		return "Product [productId=" + productId + ", name=" + name + ", categoryId=" + categoryId + "]";
 	}
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecommerce.ecommerceApp.helper.CategoryHelper;
+import com.ecommerce.ecommerceApp.helper.CommonResponseHelper;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.model.Product;
@@ -24,7 +26,7 @@ public class ProductController
 	private ProductRepository productRepository;
 	
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryHelper categoryHelper;
 	
 	@RequestMapping(path = "products/{id}", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse> getProduct(@PathVariable("id") String id)
@@ -38,12 +40,12 @@ public class ProductController
 			if(product == null)
 				throw new NullPointerException("Product Not Found for Id:" + id);
 			
-			response = getSuccessfulResponse(product);
+			response = CommonResponseHelper.getSuccessfulResponse(product);
 			response.setCode(HttpStatus.FOUND.value());
 		}
 		catch(Exception e)
 		{
-			response = getUnsuccessfulResponse(e);
+			response = CommonResponseHelper.getUnsuccessfulResponse(e);
 			response.setCode(HttpStatus.NOT_FOUND.value());
 		}
 		
@@ -56,25 +58,21 @@ public class ProductController
 		CommonResponse response;
 		
 		try
-		{
-			Category category = categoryRepository.findById(Long.valueOf(id)).orElse(null); 
-			
-			if(category == null)
-				throw new NullPointerException("Category Not Found for Id:" + id);
-					
+		{		
+			Category category = categoryHelper.isCategoryExist(Long.valueOf(id));
 			long categoryId = category.getCategoryId();
 			List<Product> productList = productRepository.findByCategoryId(categoryId);
 			
 			if(productList.size() == 0)
 				throw new Exception("Product Not Found for Category Id:" + categoryId);
 			
-			response = getSuccessfulResponse();
+			response = CommonResponseHelper.getSuccessfulResponse();
 			response.setData(productList);
 			response.setCode(HttpStatus.FOUND.value());			
 		}				
 		catch(Exception e)
 		{
-			response = getUnsuccessfulResponse(e);	
+			response = CommonResponseHelper.getUnsuccessfulResponse(e);	
 			response.setMessage("Products could not found.");
 			response.setInternalMessage(e.getMessage());
 			response.setCode(HttpStatus.EXPECTATION_FAILED.value()); 
@@ -90,15 +88,19 @@ public class ProductController
 		
 		try 
 		{
+			// if category not exist throws
+			long categoryId = product.getCategoryId();
+			categoryHelper.isCategoryExist(categoryId);
+			
 			Product createdProduct = productRepository.save(product);
 			
-			response = getSuccessfulResponse(createdProduct);
+			response = CommonResponseHelper.getSuccessfulResponse(createdProduct);
 			response.setCode(HttpStatus.CREATED.value());		
  		}
 		catch(Exception e)
 		{
-			response = getUnsuccessfulResponse(e);
-			response.setMessage("Customer cannot be added.");
+			response = CommonResponseHelper.getUnsuccessfulResponse(e);
+			response.setMessage("Product cannot be added.");
 			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
 		}	
 		
@@ -114,13 +116,13 @@ public class ProductController
 		{
 			Product updatedProduct = productRepository.save(product);
 			
-			response = getSuccessfulResponse(updatedProduct);
+			response = CommonResponseHelper.getSuccessfulResponse(updatedProduct);
 			response.setData(updatedProduct);
 			response.setCode(HttpStatus.OK.value());				
 		}
 		catch(Exception e)
 		{
-			response = getUnsuccessfulResponse(e);
+			response = CommonResponseHelper.getUnsuccessfulResponse(e);
 			response.setMessage("Customer cannot be updated.");
 			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
 		}
@@ -137,12 +139,12 @@ public class ProductController
 		{
 			productRepository.deleteById(Long.valueOf(id));
 			
-			response = getSuccessfulResponse();
+			response = CommonResponseHelper.getSuccessfulResponse();
 			response.setCode(HttpStatus.MOVED_PERMANENTLY.value());	
 		}
 		catch(Exception e)
 		{
-			response = getUnsuccessfulResponse(e);
+			response = CommonResponseHelper.getUnsuccessfulResponse(e);
 			response.setMessage("Product is not deleted.");
 			response.setInternalMessage("Product is not deleted with id:" + id);
 			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
@@ -152,34 +154,5 @@ public class ProductController
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
 	}
 
-	private CommonResponse getSuccessfulResponse(Object data)
-	{
-		CommonResponse response = new CommonResponse();
-		response.setSuccess(Boolean.TRUE);
-		response.setMessage("");
-		response.setInternalMessage("");
-		response.setData(data);
-		
-		return response;
-	}
 	
-	private CommonResponse getSuccessfulResponse()
-	{
-		CommonResponse answer = new CommonResponse();
-		answer.setSuccess(Boolean.TRUE);
-		answer.setMessage("");
-		answer.setInternalMessage("");
-		
-		return answer;
-	}
-	
-	private CommonResponse getUnsuccessfulResponse(Exception e)
-	{
-		CommonResponse answer = new CommonResponse();
-		answer.setSuccess(Boolean.FALSE);
-		answer.setMessage("Please check your information and try again.");
-		answer.setInternalMessage(e.getMessage());
-		
-		return answer;
-	}
 }

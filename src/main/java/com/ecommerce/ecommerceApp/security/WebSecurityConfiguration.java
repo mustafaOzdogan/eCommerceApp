@@ -32,11 +32,15 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	protected void configure(HttpSecurity httpSecurity) throws Exception
 	{
 		httpSecurity.cors().and().csrf().disable().authorizeRequests()
-		            .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+		            .antMatchers("/h2/**").permitAll()
+		            .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()	            
 		            .anyRequest().authenticated()
 		            .and().addFilter(new AuthenticationFilter(authenticationManager()))
 		            .addFilter(new AuthorizationFilter(authenticationManager()))
 		            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		// to use h2 web console
+		httpSecurity.headers().frameOptions().disable();
 	}
 	
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception
