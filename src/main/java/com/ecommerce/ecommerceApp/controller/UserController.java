@@ -17,7 +17,8 @@ import com.ecommerce.ecommerceApp.service.UserService;
 public class UserController 
 {
 	@Autowired
-	private UserService userService;		
+	private UserService userService;
+	
 	private BCryptPasswordEncoder bCryptPasswordEncoder;;
 	
 	public UserController(BCryptPasswordEncoder bCryptPasswordEncoder) 
@@ -34,39 +35,23 @@ public class UserController
 		{
 			user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 			userService.save(user);
-			
-			response = getSuccessfulResponse(user);
-			response.setCode(HttpStatus.CREATED.value());	
+					
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(user)
+					.withCode(HttpStatus.CREATED.value())
+					.build();
 		}
 		catch(Exception e)
-		{
-			//TODO COMMON METHOD HELPER
-			response = getUnsuccessfulResponse(e);
-			response.setMessage("User cannot be created.");
-			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
+		{			
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withInternalMessage(e.getMessage())
+					.withMessage("User cannot be created.")
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();
 		}
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
-	}
-	
-	private CommonResponse getSuccessfulResponse(Object data)
-	{
-		CommonResponse response = new CommonResponse();
-		response.setSuccess(Boolean.TRUE);
-		response.setMessage("");
-		response.setInternalMessage("");
-		response.setData(data);
-		
-		return response;
-	}
-	
-	private CommonResponse getUnsuccessfulResponse(Exception e)
-	{
-		CommonResponse answer = new CommonResponse();
-		answer.setSuccess(Boolean.FALSE);
-		answer.setMessage("Please check your information and try again.");
-		answer.setInternalMessage(e.getMessage());
-		
-		return answer;
-	}
+	}	
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.ecommerceApp.helper.CommonResponseHelper;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.model.Product;
@@ -38,14 +37,20 @@ public class ProductController
 			
 			if(product == null)
 				throw new NullPointerException("Product Not Found for Id:" + id);
-			
-			response = CommonResponseHelper.getSuccessfulResponse(product);
-			response.setCode(HttpStatus.FOUND.value());
+						
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(product)
+					.withCode(HttpStatus.FOUND.value())
+					.build();
 		}
 		catch(Exception e)
-		{
-			response = CommonResponseHelper.getUnsuccessfulResponse(e);
-			response.setCode(HttpStatus.NOT_FOUND.value());
+		{			
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withCode(HttpStatus.NOT_FOUND.value())
+					.withInternalMessage(e.getMessage())
+					.build();
 		}
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
@@ -66,17 +71,21 @@ public class ProductController
 			
 			if(productList.size() == 0)
 				throw new Exception("Product Not Found for Category Id:" + id);
-			
-			response = CommonResponseHelper.getSuccessfulResponse();
-			response.setData(productList);
-			response.setCode(HttpStatus.FOUND.value());			
+		
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(productList)
+					.withCode(HttpStatus.FOUND.value())
+					.build();		
 		}				
 		catch(Exception e)
-		{
-			response = CommonResponseHelper.getUnsuccessfulResponse(e);	
-			response.setMessage("Products could not found.");
-			response.setInternalMessage(e.getMessage());
-			response.setCode(HttpStatus.EXPECTATION_FAILED.value()); 
+		{			
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withInternalMessage(e.getMessage())
+					.withMessage("Products could not found.")
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();			
 		}
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
@@ -96,14 +105,20 @@ public class ProductController
 			
 			Product createdProduct = productService.save(product);
 			
-			response = CommonResponseHelper.getSuccessfulResponse(createdProduct);
-			response.setCode(HttpStatus.CREATED.value());		
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(createdProduct)
+					.withCode(HttpStatus.CREATED.value())
+					.build();
  		}
 		catch(Exception e)
-		{
-			response = CommonResponseHelper.getUnsuccessfulResponse(e);
-			response.setMessage("Product cannot be added.");
-			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
+		{		
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withInternalMessage(e.getMessage())
+					.withMessage("Product cannot be added.")
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();	
 		}	
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
@@ -117,16 +132,21 @@ public class ProductController
 		try
 		{
 			Product updatedProduct = productService.save(product);
-			
-			response = CommonResponseHelper.getSuccessfulResponse(updatedProduct);
-			response.setData(updatedProduct);
-			response.setCode(HttpStatus.OK.value());				
+					
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(updatedProduct)
+					.withCode(HttpStatus.OK.value())
+					.build();
 		}
 		catch(Exception e)
-		{
-			response = CommonResponseHelper.getUnsuccessfulResponse(e);
-			response.setMessage("Customer cannot be updated.");
-			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
+		{			
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withInternalMessage(e.getMessage())
+					.withMessage("Product cannot be updated.")
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();	
 		}
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
@@ -141,16 +161,19 @@ public class ProductController
 		{
 			productService.deleteProductById(Long.valueOf(id));
 			
-			response = CommonResponseHelper.getSuccessfulResponse();
-			response.setCode(HttpStatus.MOVED_PERMANENTLY.value());	
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withCode(HttpStatus.MOVED_PERMANENTLY.value())
+					.build();
 		}
 		catch(Exception e)
-		{
-			response = CommonResponseHelper.getUnsuccessfulResponse(e);
-			response.setMessage("Product is not deleted.");
-			response.setInternalMessage("Product is not deleted with id:" + id);
-			response.setCode(HttpStatus.EXPECTATION_FAILED.value());
-			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+		{			
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withMessage("Product is not deleted with id:" + id)
+					.withInternalMessage(e.getMessage())
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();	
 		}
 		
 		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);

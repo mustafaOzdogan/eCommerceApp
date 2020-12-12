@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.ecommerceApp.helper.CommonResponseHelper;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.service.CategoryService;
@@ -22,24 +21,28 @@ public class CategoryController
 	@RequestMapping(path="categories", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse> addCategory(@RequestBody Category category) 
 	{
-		CommonResponse answer;
+		CommonResponse response;
 		
 		try 
 		{
 			Category createdCategory = categoryService.save(category);
 			
-			//TODO Builder pattern 
-			answer = CommonResponseHelper.getSuccessfulResponse(createdCategory);
-			answer.setData(createdCategory);
-			answer.setCode(HttpStatus.CREATED.value());		
+			response = new CommonResponse.Builder()
+					.isSuccessful(true)
+					.withData(createdCategory)
+					.withCode(HttpStatus.CREATED.value())
+					.build();
  		}
 		catch(Exception e)
 		{
-			answer = CommonResponseHelper.getUnsuccessfulResponse(e);
-			answer.setMessage("Category cannot be added.");
-			answer.setCode(HttpStatus.EXPECTATION_FAILED.value());
+			response = new CommonResponse.Builder()
+					.isSuccessful(false)
+					.withMessage("Category cannot be added.")
+					.withInternalMessage(e.getMessage())
+					.withCode(HttpStatus.EXPECTATION_FAILED.value())
+					.build();
 		}	
 		
-		return new ResponseEntity<CommonResponse>(answer, HttpStatus.OK);
+		return new ResponseEntity<CommonResponse>(response, HttpStatus.OK);
 	}
 }
