@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.ecommerceApp.helper.CommonResponseHelper;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.CommonResponse;
-import com.ecommerce.ecommerceApp.repository.CategoryRepository;
+import com.ecommerce.ecommerceApp.service.CategoryService;
 
 @RestController
 public class CategoryController 
 {
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryService categoryService;
 	
 	@RequestMapping(path="categories", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse> addCategory(@RequestBody Category category) 
@@ -26,7 +26,7 @@ public class CategoryController
 		
 		try 
 		{
-			Category createdCategory = categoryRepository.save(category);
+			Category createdCategory = categoryService.save(category);
 			
 			//TODO Builder pattern 
 			answer = CommonResponseHelper.getSuccessfulResponse(createdCategory);

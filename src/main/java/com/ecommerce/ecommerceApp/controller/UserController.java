@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerceApp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,18 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.model.User;
-import com.ecommerce.ecommerceApp.repository.UserRepository;
+import com.ecommerce.ecommerceApp.service.UserService;
 
 @RestController
 public class UserController 
 {
-	private UserRepository userRepository;		
+	@Autowired
+	private UserService userService;		
 	private BCryptPasswordEncoder bCryptPasswordEncoder;;
 	
-	public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserRepository userRepository) 
+	public UserController(BCryptPasswordEncoder bCryptPasswordEncoder) 
 	{
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-		this.userRepository = userRepository;
 	}
 		
 	@RequestMapping(path="signup", method = RequestMethod.POST)
@@ -32,7 +33,7 @@ public class UserController
 		try 
 		{
 			user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-			userRepository.save(user);
+			userService.save(user);
 			
 			response = getSuccessfulResponse(user);
 			response.setCode(HttpStatus.CREATED.value());	

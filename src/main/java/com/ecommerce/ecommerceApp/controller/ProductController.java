@@ -11,22 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.ecommerceApp.helper.CategoryHelper;
 import com.ecommerce.ecommerceApp.helper.CommonResponseHelper;
 import com.ecommerce.ecommerceApp.model.Category;
 import com.ecommerce.ecommerceApp.model.CommonResponse;
 import com.ecommerce.ecommerceApp.model.Product;
-import com.ecommerce.ecommerceApp.repository.CategoryRepository;
-import com.ecommerce.ecommerceApp.repository.ProductRepository;
+import com.ecommerce.ecommerceApp.service.CategoryService;
+import com.ecommerce.ecommerceApp.service.ProductService;
 
 @RestController
 public class ProductController 
 {
 	@Autowired
-	private ProductRepository productRepository;
+	private ProductService productService;
 	
 	@Autowired
-	private CategoryHelper categoryHelper;
+	private CategoryService categoryService;
 	
 	@RequestMapping(path = "products/{id}", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse> getProduct(@PathVariable("id") String id)
@@ -35,7 +34,7 @@ public class ProductController
 		
 		try
 		{
-			Product product = productRepository.findById(Long.valueOf(id)).orElse(null);	
+			Product product = productService.getProductById(Long.valueOf(id));	
 			
 			if(product == null)
 				throw new NullPointerException("Product Not Found for Id:" + id);
@@ -59,12 +58,14 @@ public class ProductController
 		
 		try
 		{		
-			Category category = categoryHelper.isCategoryExist(Long.valueOf(id));
-			long categoryId = category.getCategoryId();
-			List<Product> productList = productRepository.findByCategoryId(categoryId);
+			Category category = categoryService.getCategoryById(Long.valueOf(id));
+			if(category == null)
+				throw new Exception("Category Not Found for Id:" + id); 
+			
+			List<Product> productList = productService.getProductsByCategoryId(Long.valueOf(id));
 			
 			if(productList.size() == 0)
-				throw new Exception("Product Not Found for Category Id:" + categoryId);
+				throw new Exception("Product Not Found for Category Id:" + id);
 			
 			response = CommonResponseHelper.getSuccessfulResponse();
 			response.setData(productList);
@@ -89,10 +90,11 @@ public class ProductController
 		try 
 		{
 			// if category not exist throws
-			long categoryId = product.getCategoryId();
-			categoryHelper.isCategoryExist(categoryId);
+			Category category = categoryService.getCategoryById(product.getCategoryId());
+			if(category == null)
+				throw new Exception("Category Not Found for Id:" + product.getCategoryId()); 
 			
-			Product createdProduct = productRepository.save(product);
+			Product createdProduct = productService.save(product);
 			
 			response = CommonResponseHelper.getSuccessfulResponse(createdProduct);
 			response.setCode(HttpStatus.CREATED.value());		
@@ -114,7 +116,7 @@ public class ProductController
 		
 		try
 		{
-			Product updatedProduct = productRepository.save(product);
+			Product updatedProduct = productService.save(product);
 			
 			response = CommonResponseHelper.getSuccessfulResponse(updatedProduct);
 			response.setData(updatedProduct);
@@ -137,7 +139,7 @@ public class ProductController
 		
 		try
 		{
-			productRepository.deleteById(Long.valueOf(id));
+			productService.deleteProductById(Long.valueOf(id));
 			
 			response = CommonResponseHelper.getSuccessfulResponse();
 			response.setCode(HttpStatus.MOVED_PERMANENTLY.value());	
